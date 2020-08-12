@@ -1,0 +1,19 @@
+---
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/python:2.7
+    environment:
+      - PIPENV_VENV_IN_PROJECT=1
+    steps:
+      - checkout
+      - run: pipenv sync --dev
+      - run: pipenv run py.test tests
+
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - test
