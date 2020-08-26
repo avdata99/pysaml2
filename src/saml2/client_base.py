@@ -52,6 +52,7 @@ from saml2.response import AuthnResponse
 from saml2 import BINDING_HTTP_REDIRECT
 from saml2 import BINDING_HTTP_POST
 from saml2 import BINDING_PAOS
+# Data.gov: TODO remove this, pass any configuration in through who.ini
 from pylons import config
 
 logger = logging.getLogger(__name__)
@@ -463,7 +464,7 @@ class Base(Entity):
                                      sign_alg=sign_alg, digest_alg=digest_alg,
                                      **args)
 
-		# NOTE: MAX.gov -- create pylons Authn Context for MAX.gov 2FA       
+		# NOTE: MAX.gov -- create pylons Authn Context for MAX.gov 2FA
         requested_authn_context = None
         if config.get('saml2.max_security_level'):
             context_class_ref = saml.AuthnContextClassRef()

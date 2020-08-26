@@ -13,6 +13,7 @@ pytest = "*"
 pytest-cov = "*"
 responses = "*"
 tox = "*"
+pylons = "*"
 
 [packages]
 

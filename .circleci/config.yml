@@ -8,6 +8,7 @@ jobs:
       - PIPENV_VENV_IN_PROJECT=1
     steps:
       - checkout
+      - run: sudo apt-get install -y xmlsec1
       - run: pipenv sync --dev
       - run: pipenv run py.test tests
 
