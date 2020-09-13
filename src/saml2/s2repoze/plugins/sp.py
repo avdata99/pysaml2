@@ -464,14 +464,13 @@ class SAML2Plugin(object):
 
         uri = environ.get("REQUEST_URI", construct_url(environ))
         query = parse_dict_querystring(environ)
-
+        
         logger.debug("[sp.identify] uri: %s", uri)
         logger.debug("[sp.identify] query: %s", query)
 
         is_request = "SAMLRequest" in query
         is_response = "SAMLResponse" in query
-        has_content_length = "CONTENT_LENGTH" in environ or environ["CONTENT_LENGTH"]
-
+        has_content_length = environ.get("CONTENT_LENGTH", False)
         if not has_content_length and not is_request and not is_response:
             logger.debug("[identify] get or empty post")
             return None
@@ -482,20 +481,23 @@ class SAML2Plugin(object):
         else:
             post = self._get_post(environ)
             binding = BINDING_HTTP_POST
-
+            keys = post.keys()
+            is_request = "SAMLRequest" in keys
+            is_response = "SAMLResponse" in keys
         try:
             logger.debug("[sp.identify] post keys: %s", post.keys())
-        except (TypeError, IndexError):
+        except (TypeError, IndexError) as e:
+            logger.exception(e)
             pass
 
         try:
             path = getpath(environ)
+
             logout = False
             if path in self.logout_endpoints:
                 logout = True
 
             if logout and is_request:
-                print("logout request received")
                 if binding == BINDING_HTTP_REDIRECT:
                     saml_request = post["SAMLRequest"]
                 else:
