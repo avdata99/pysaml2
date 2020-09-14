@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+defusedxml = "*"
 coverage = "*"
 mock = "*"
 pyasn1 = "*"
@@ -13,8 +14,16 @@ pytest = "*"
 pytest-cov = "*"
 responses = "*"
 tox = "*"
+cryptography = ">=1.4"
+python-dateutil = "*"
+pytz = "*"
+pyopenssl = "*"
+paste = "==1.7.5.1"
+"zope.interface" = "==4.3.2"
+"repoze.who" = "==2.3"
 
 [packages]
+
 
 [requires]
 python_version = "2.7"
