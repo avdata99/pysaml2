@@ -44,10 +44,10 @@ class Population(object):
     def issuers_of_info(self, name_id):
         return self.cache.entities(name_id)
 
-    def get_identity(self, name_id, entities=None, check_not_on_or_after=True):
+    def get_identity(self, name_id, entities=None, check_not_on_or_after=False):
         return self.cache.get_identity(name_id, entities, check_not_on_or_after)
 
-    def get_info_from(self, name_id, entity_id, check_not_on_or_after=True):
+    def get_info_from(self, name_id, entity_id, check_not_on_or_after=False):
         return self.cache.get(name_id, entity_id, check_not_on_or_after)
 
     def subjects(self):
@@ -57,7 +57,7 @@ class Population(object):
     def remove_person(self, name_id):
         self.cache.delete(name_id)
 
-    def get_entityid(self, name_id, source_id, check_not_on_or_after=True):
+    def get_entityid(self, name_id, source_id, check_not_on_or_after=False):
         try:
             return self.cache.get(name_id, source_id, check_not_on_or_after)[
                 "name_id"]

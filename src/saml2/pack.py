@@ -13,6 +13,8 @@ try:
 except:
     import cgi as html
 
+import urllib
+from webhelpers.html import url_escape
 import logging
 
 import saml2

@@ -34,7 +34,7 @@ class Cache(object):
             if not self._cache.set("subjects", subjects):
                 raise CacheError("Set operation failed")
 
-    def get_identity(self, subject_id, entities=None):
+    def get_identity(self, subject_id, entities=None, check_not_on_or_after=False):
         """ Get all the identity information that has been received and
         are still valid about the subject.
 
@@ -67,7 +67,7 @@ class Cache(object):
                     res[key] = vals
         return res, oldees
 
-    def get_info(self, item, check_not_on_or_after=True):
+    def get_info(self, item, check_not_on_or_after=False):
         """ Get session information about a subject gotten from a
         specified IdP/AA.
 
@@ -84,7 +84,7 @@ class Cache(object):
 
         return info or None
 
-    def get(self, subject_id, entity_id, check_not_on_or_after=True):
+    def get(self, subject_id, entity_id, check_not_on_or_after=False):
         res = self._cache.get(_key(subject_id, entity_id))
         if not res:
             return {}
