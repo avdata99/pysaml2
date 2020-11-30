@@ -52,7 +52,7 @@ from saml2.response import AuthnResponse
 from saml2 import BINDING_HTTP_REDIRECT
 from saml2 import BINDING_HTTP_POST
 from saml2 import BINDING_PAOS
-from pylons import config
+import pylons
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ class Base(Entity):
         :param virtual_organization: A specific virtual organization
         """
 
-        Entity.__init__(self, "sp", config, config_file, virtual_organization,
+        Entity.__init__(self, "sp", pylons.config, config_file, virtual_organization,
                         msg_cb=msg_cb)
 
         self.users = Population(identity_cache)
