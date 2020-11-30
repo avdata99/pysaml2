@@ -16,7 +16,7 @@ jobs:
           command: pipenv sync --dev
       - run:
           name: run tests
-          command: pipenv run py.test tests
+          command: pipenv run pytest tests
 
 
 workflows:
