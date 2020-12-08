@@ -473,7 +473,10 @@ class SAML2Plugin(object):
 
         is_request = "SAMLRequest" in query
         is_response = "SAMLResponse" in query
-        has_content_length = environ.get("CONTENT_LENGTH", False)
+
+        # https://github.com/IdentityPython/pysaml2/issues/676
+        has_content_length = "CONTENT_LENGTH" in environ and environ["CONTENT_LENGTH"]
+
         if not has_content_length and not is_request and not is_response:
             logger.debug("[identify] get or empty post")
             return None
