@@ -473,7 +473,6 @@ class SAML2Plugin(object):
 
         is_request = "SAMLRequest" in query
         is_response = "SAMLResponse" in query
-
         # https://github.com/IdentityPython/pysaml2/issues/676
         has_content_length = "CONTENT_LENGTH" in environ and environ["CONTENT_LENGTH"]
 
