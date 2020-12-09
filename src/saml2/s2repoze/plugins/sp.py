@@ -12,7 +12,6 @@ import shelve
 import traceback
 import saml2
 import six
-import saml2.mcache as mcache
 from saml2.samlp import Extensions
 from saml2 import xmldsig as ds
 
@@ -692,9 +691,6 @@ def make_plugin(
 
     if remember_name is None:
         raise ValueError("must include remember_name in configuration")
-
-    if identity_cache == "memcached":
-      identity_cache = mcache.Cache(['127.0.0.1:11211'], debug=0)
 
     conf = config_factory("sp", saml_conf)
 
