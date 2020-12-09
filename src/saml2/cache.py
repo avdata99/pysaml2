@@ -44,7 +44,7 @@ class Cache(object):
                 pass
 
     def get_identity(self, name_id, entities=None,
-                     check_not_on_or_after=False):
+                     check_not_on_or_after=True):
         """ Get all the identity information that has been received and
         are still valid about the subject.
 
@@ -83,7 +83,7 @@ class Cache(object):
                     res[key] = vals
         return res, oldees
 
-    def get(self, subject_id, entity_id, check_not_on_or_after=False):
+    def get(self, name_id, entity_id, check_not_on_or_after=True):
         """ Get session information about a subject gotten from a
         specified IdP/AA.
 

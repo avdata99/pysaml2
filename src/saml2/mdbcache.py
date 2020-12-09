@@ -34,7 +34,7 @@ class Cache(object):
         self._cache.delete_many({'subject_id': subject_id})
 
     def get_identity(self, subject_id, entities=None,
-                     check_not_on_or_after=False):
+                     check_not_on_or_after=True):
         """ Get all the identity information that has been received and
         are still valid about the subject.
 
@@ -79,7 +79,7 @@ class Cache(object):
 
         return res, oldees
 
-    def _get_info(self, item, check_not_on_or_after=False):
+    def _get_info(self, item, check_not_on_or_after=True):
         """ Get session information about a subject gotten from a
         specified IdP/AA.
 
@@ -96,7 +96,7 @@ class Cache(object):
         except KeyError:
             return None
 
-    def get(self, subject_id, entity_id, check_not_on_or_after=False):
+    def get(self, subject_id, entity_id, check_not_on_or_after=True):
         res = self._cache.find_one({"subject_id": subject_id,
                                     "entity_id": entity_id})
         if not res:
