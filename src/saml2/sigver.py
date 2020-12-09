@@ -1398,6 +1398,7 @@ class SecurityContext(object):
             try:
                 dectext = self.crypto.decrypt(enctext, key_file, id_attr)
             except XmlsecError as e:
+                logger.exception("[decrypt] XmlsecError!")
                 continue
             else:
                 if dectext:

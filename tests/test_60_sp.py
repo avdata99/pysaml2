@@ -7,16 +7,19 @@ from saml2.authn_context import INTERNETPROTOCOLPASSWORD
 from saml2.saml import NAMEID_FORMAT_TRANSIENT
 from saml2.samlp import NameIDPolicy
 from saml2.server import Server
+from six import StringIO
+import urllib
+import zlib
 
 try:
     from saml2.s2repoze.plugins.sp import make_plugin
 except ImportError:
     make_plugin = None
 
-ENV1 = {'SERVER_SOFTWARE': 'CherryPy/3.1.2 WSGI Server',
+ENV = {'SERVER_SOFTWARE': 'CherryPy/3.1.2 WSGI Server',
         'SCRIPT_NAME': '',
         'ACTUAL_SERVER_PROTOCOL': 'HTTP/1.1',
-        'REQUEST_METHOD': 'GET',
+        'REQUEST_METHOD': 'POST',
         'PATH_INFO': '/krissms',
         'SERVER_PROTOCOL': 'HTTP/1.1',
         'QUERY_STRING': '',
@@ -37,7 +40,9 @@ ENV1 = {'SERVER_SOFTWARE': 'CherryPy/3.1.2 WSGI Server',
         'wsgi.run_once': False,
         'wsgi.multiprocess': False,
         'HTTP_ACCEPT_LANGUAGE': 'en-us',
-        'HTTP_ACCEPT_ENCODING': 'gzip, deflate'}
+        'HTTP_ACCEPT_ENCODING': 'gzip, deflate',
+        'CONTENT_LENGTH': 42
+}
 
 trans_name_policy = NameIDPolicy(format=NAMEID_FORMAT_TRANSIENT,
                                  allow_create="true")
@@ -77,13 +82,40 @@ class TestSP():
         self.sp.outstanding_queries = {"id1": "http://www.example.com/service"}
         session_info = self.sp._eval_authn_response(
             {}, {"SAMLResponse": [resp_str]})
-
         assert len(session_info) > 1
         assert session_info["came_from"] == 'http://www.example.com/service'
         assert session_info["ava"] == {'givenName': ['Derek'],
                                        'mail': ['derek@nyy.mlb.com'],
                                        'sn': ['Jeter'],
                                        'title': ['The man']}
+
+    def test_identify_post(self):
+        """
+        Call identity() with an environment with an SAML response
+        delivered via POST
+        """
+
+        environ = ENV.copy()
+        ava = {"givenName": ["Derek"], "surName": ["Jeter"],
+               "mail": ["derek@nyy.mlb.com"], "title": ["The man"]}
+
+        resp_str = "%s" % self.server.create_authn_response(
+            ava, "id1", "http://lingon.catalogix.se:8087/",
+            "urn:mace:example.com:saml:roland:sp", trans_name_policy,
+            "foba0001@example.com", authn=AUTHN)
+        resp_str = base64.encodestring(resp_str.encode('utf-8'))
+        resp_dict = dict(SAMLResponse=resp_str)
+        resp_encoded = urllib.urlencode(resp_dict)
+        environ['CONTENT_LENGTH'] = str(len(resp_encoded))
+        environ['wsgi.input'] = StringIO(resp_encoded)
+        environ['REQUEST_METHOD'] = 'POST'
+
+        identify_info = self.sp.identify(environ)
+
+        assert identify_info["user"] == {'givenName': ['Derek'],
+                                         'mail': ['derek@nyy.mlb.com'],
+                                         'sn': ['Jeter'],
+                                         'title': ['The man']}
 
 
 if __name__ == "__main__":

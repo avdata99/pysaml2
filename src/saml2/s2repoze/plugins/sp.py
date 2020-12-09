@@ -124,6 +124,7 @@ class SAML2Plugin(object):
 
         self.iam = platform.node()
 
+        logger.debug("SAML2Plugin constructed.  sid_store=%r, sid_store_cert=%r", sid_store, sid_store_cert)
     def _get_rememberer(self, environ):
         rememberer = environ["repoze.who.plugins"][self.rememberer_name]
         return rememberer
@@ -273,6 +274,8 @@ class SAML2Plugin(object):
     # noinspection PyUnusedLocal
     def challenge(self, environ, _status, _app_headers, _forget_headers):
 
+        logger.debug("[sp.challenge()]")
+        
         _cli = self.saml_client
 
         if "REMOTE_USER" in environ:
@@ -469,7 +472,7 @@ class SAML2Plugin(object):
 
         uri = environ.get("REQUEST_URI", construct_url(environ))
         query = parse_dict_querystring(environ)
-
+        
         logger.debug("[sp.identify] uri: %s", uri)
         logger.debug("[sp.identify] query: %s", query)
 
@@ -488,20 +491,23 @@ class SAML2Plugin(object):
         else:
             post = self._get_post(environ)
             binding = BINDING_HTTP_POST
-
+            keys = post.keys()
+            is_request = "SAMLRequest" in keys
+            is_response = "SAMLResponse" in keys
         try:
             logger.debug("[sp.identify] post keys: %s", post.keys())
-        except (TypeError, IndexError):
+        except (TypeError, IndexError) as e:
+            logger.exception(e)
             pass
 
         try:
             path = getpath(environ)
+
             logout = False
             if path in self.logout_endpoints:
                 logout = True
 
             if logout and is_request:
-                print("logout request received")
                 if binding == BINDING_HTTP_REDIRECT:
                     saml_request = post["SAMLRequest"]
                 else:
@@ -548,16 +554,19 @@ class SAML2Plugin(object):
                             environ, post, binding=binding
                         )
                 except Exception as err:
+                    logger.exception("[sp.identify] saml_error")
                     environ["s2repoze.saml_error"] = err
                     return {}
         except TypeError as exc:
             # might be a ECP (=SOAP) response
+            logger.debug("[sp.identify] TypeError - maybe SOAP/ECP response?")
             body = environ.get("s2repoze.body", None)
             if body:
                 # might be a ECP response
                 try:
                     session_info = self.do_ecp_response(body, environ)
                 except Exception as err:
+                    logger.exception("[sp.identify] saml_error (ECP)")
                     environ["post.fieldstorage"] = post
                     environ["s2repoze.saml_error"] = err
                     return {}
@@ -601,6 +610,7 @@ class SAML2Plugin(object):
             logger.debug("[add_metadata] adds: %s", ava)
             identity["user"].update(ava)
         except KeyError:
+            logger.exception("[add_metadata]")
             pass
 
         if "pysaml2_vo_expanded" not in identity and _cli.vorg:
@@ -675,6 +685,7 @@ def make_plugin(
     identity_cache="",
     discovery="",
     idp_query_param="",
+    sid_store_cert=None
 ):
     if saml_conf is "":
         raise ValueError("must include saml_conf in configuration")
@@ -694,6 +705,6 @@ def make_plugin(
     )
 
     plugin = SAML2Plugin(
-        remember_name, conf, scl, wayf, cache, sid_store, discovery, idp_query_param
+        remember_name, conf, scl, wayf, cache, sid_store, discovery, idp_query_param, sid_store_cert
     )
     return plugin

@@ -368,7 +368,7 @@ class Entity(HTTPBase):
         :param msgtype:
         :return:
         """
-        # logger.debug("unravel '%s'", txt)
+        # logger.error("unravel '%s'", txt)
         if binding not in [BINDING_HTTP_REDIRECT, BINDING_HTTP_POST,
                            BINDING_SOAP, BINDING_URI, BINDING_HTTP_ARTIFACT,
                            None]:
@@ -1123,7 +1123,7 @@ class Entity(HTTPBase):
         try:
             response = response_cls(self.sec, **kwargs)
         except Exception as exc:
-            logger.info("%s", exc)
+            logger.error("%s", exc)
             raise
 
         xmlstr = self.unravel(xmlstr, binding, response_cls.msgtype)

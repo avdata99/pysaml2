@@ -1,0 +1,26 @@
+---
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/python:2.7
+    environment:
+      - PIPENV_VENV_IN_PROJECT=1
+    steps:
+      - checkout
+      - run:
+          name: install OS dependencies
+          command: sudo apt-get install -y xmlsec1
+      - run:
+          name: install python dependencies
+          command: pipenv sync --dev
+      - run:
+          name: run tests
+          command: pipenv run py.test tests
+
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - test
