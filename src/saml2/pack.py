@@ -13,8 +13,6 @@ try:
 except:
     import cgi as html
 
-import urllib
-from webhelpers.html import url_escape
 import logging
 
 import saml2
@@ -113,16 +111,6 @@ def http_form_post_message(message, location, relay_state="",
         relay_state_input=relay_state_input,
         action=location)
 
-    # NOTE MAX.gov some UI business? Can we move this out of here?
-    response.append(FORM_SPEC % (location, typ, _msg, url_escape(relay_state)))
-    response.append("<div id=logging>Connecting MAX.gov</div>")
-    response.append("""<script type="text/javascript">""")
-    response.append("     document.getElementsByTagName('input')[2].style.display='none';")
-    response.append("     window.onload = function ()")
-    response.append(" { document.forms[0].submit(); };")
-    response.append("     setTimeout(function(){document.getElementsByTagName('input')[2].style.display='';document.getElementById('logging').style.display='none'},45000)")
-    response.append("""</script>""")
-    response.append("</body>")
     return {"headers": [("Content-type", "text/html")], "data": response}
 
 
