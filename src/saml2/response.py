@@ -546,6 +546,7 @@ class AuthnResponse(StatusResponse):
         return self
 
     def clear(self):
+        logger.debug('Saml2 CLEAR')
         self._clear()
         self.came_from = None
         self.ava = None
@@ -1004,6 +1005,7 @@ class AuthnResponse(StatusResponse):
                         if len(advice_res) > 0:
                             tmp_ass.advice.encrypted_assertion = []
 
+            logger.debug('Response Assertion {}'.format(resp.assertion))
             self.response.assertion = resp.assertion
             for assertion in _enc_assertions:
                 if not self._assertion(assertion, True):
@@ -1020,6 +1022,7 @@ class AuthnResponse(StatusResponse):
                 self.assertions.append(assertion)
 
         if self.assertions and len(self.assertions) > 0:
+            logger.debug('Assertion List {}'.format(self.assertions[0]))
             self.assertion = self.assertions[0]
 
         if self.context == "AuthnReq" or self.context == "AttrQuery":
@@ -1035,7 +1038,7 @@ class AuthnResponse(StatusResponse):
         :param keys: If not the default key file should be used then use one
         of these.
         """
-
+        logger.info('Verifying {}'.format(keys))
         try:
             res = self._verify()
         except AssertionError as err:
@@ -1185,6 +1188,7 @@ class AuthnQueryResponse(AuthnResponse):
         self.entity_id = entity_id
         self.attribute_converters = attribute_converters
         self.assertion = None
+        logger.debug('Assertion None AuthnQueryResponse')
         self.context = "AuthnQuery"
 
     def condition_ok(self, lax=False):  # Should I care about conditions ?
@@ -1204,6 +1208,7 @@ class AttributeResponse(AuthnResponse):
         self.entity_id = entity_id
         self.attribute_converters = attribute_converters
         self.assertion = None
+        logger.debug('Assertion None AttributeResponse')
         self.context = "AttrQuery"
 
 
@@ -1221,6 +1226,7 @@ class AuthzResponse(AuthnResponse):
         self.entity_id = entity_id
         self.attribute_converters = attribute_converters
         self.assertion = None
+        logger.debug('Assertion None AuthzResponse')
         self.context = "AuthzQuery"
 
 
@@ -1237,6 +1243,7 @@ class ArtifactResponse(AuthnResponse):
         self.entity_id = entity_id
         self.attribute_converters = attribute_converters
         self.assertion = None
+        logger.debug('Assertion None ArtifactResponse')
         self.context = "ArtifactResolve"
 
 
@@ -1317,6 +1324,7 @@ class AssertionIDResponse(object):
 
         try:
             self.response = self.signature_check(xmldata, origdoc=origxml)
+            logger.debug('Asertion=response {}'.format(self.response))
             self.assertion = self.response
         except TypeError:
             raise

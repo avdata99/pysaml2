@@ -1167,13 +1167,17 @@ class Entity(HTTPBase):
         if not response:
             return response
 
+        logger.debug('Gettings keys')
         keys = None
         if outstanding_certs:
             try:
+                logger.debug('Gettings outstanding_certs {}\n\t{}\n\t{}'.format(outstanding_certs, response, response.in_response_to))
                 cert = outstanding_certs[response.in_response_to]
             except KeyError:
+                logger.error('NO KEYS found')
                 keys = None
             else:
+                logger.error('Checking certs {}'.format(cert))
                 if not isinstance(cert, list):
                     cert = [cert]
                 keys = []
