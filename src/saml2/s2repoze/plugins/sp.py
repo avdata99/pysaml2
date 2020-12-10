@@ -12,7 +12,6 @@ import shelve
 import traceback
 import saml2
 import six
-import saml2.mcache as mcache
 from saml2.samlp import Extensions
 from saml2 import xmldsig as ds
 
@@ -327,8 +326,7 @@ class SAML2Plugin(object):
             entity_id = response
             logger.info("[sp.challenge] entity_id: %s", entity_id)
             # Do the AuthnRequest
-            # Use POST binding for MAX.gov
-            _binding = BINDING_HTTP_POST
+            _binding = BINDING_HTTP_REDIRECT
             try:
                 srvs = _cli.metadata.single_sign_on_service(entity_id, _binding)
                 logger.debug("srvs: %s", srvs)
@@ -400,10 +398,7 @@ class SAML2Plugin(object):
                 logger.debug("redirect to: %s", ht_args["headers"][0][1])
                 return HTTPSeeOther(headers=ht_args["headers"])
             else:
-                def _app(environ, start_response):
-                    start_response('200 OK', [('content-type', 'text/html')])
-                    return [''.join(ht_args["data"])]
-                return _app
+                return ht_args["data"]
 
     def _construct_identity(self, session_info):
         cni = code(session_info["name_id"])
@@ -692,9 +687,6 @@ def make_plugin(
 
     if remember_name is None:
         raise ValueError("must include remember_name in configuration")
-
-    if identity_cache == "memcached":
-      identity_cache = mcache.Cache(['127.0.0.1:11211'], debug=0)
 
     conf = config_factory("sp", saml_conf)
 

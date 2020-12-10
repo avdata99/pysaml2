@@ -52,7 +52,7 @@ from saml2.response import AuthnResponse
 from saml2 import BINDING_HTTP_REDIRECT
 from saml2 import BINDING_HTTP_POST
 from saml2 import BINDING_PAOS
-from pylons import config
+
 
 logger = logging.getLogger(__name__)
 
@@ -462,20 +462,8 @@ class Base(Entity):
                                      scoping=scoping, nsprefix=nsprefix,
                                      sign_alg=sign_alg, digest_alg=digest_alg,
                                      **args)
-
-		# NOTE: MAX.gov -- create pylons Authn Context for MAX.gov 2FA       
-        requested_authn_context = None
-        if config.get('saml2.max_security_level'):
-            context_class_ref = saml.AuthnContextClassRef()
-            context_class_ref.text = config.get('saml2.max_security_level')
-            requested_authn_context = samlp.RequestedAuthnContext()
-            requested_authn_context.authn_context_class_ref.append(
-                context_class_ref
-            )
-
         return self._message(AuthnRequest, destination, message_id, consent,
                              extensions, sign, sign_prepare,
-                             requested_authn_context=requested_authn_context,
                              protocol_binding=binding,
                              scoping=scoping, nsprefix=nsprefix,
                              sign_alg=sign_alg, digest_alg=digest_alg, **args)
